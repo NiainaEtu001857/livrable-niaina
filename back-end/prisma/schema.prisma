@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  refreshToken String?
+
+  wizard    WizardState?
+  createdAt DateTime @default(now())
+}
+
+model WizardState {
+  id       String @id @default(cuid())
+  step     Int
+
+  defunt   Defunt?
+  heirs    Heir[]
+  assets   Asset[]
+  declarant Declarant?
+  certs    Certs?
+
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id])
+}
+
+model Defunt {
+  id       String @id @default(cuid())
+  nom      String
+  prenom   String
+  dob      DateTime
+  dod      DateTime
+  commune  String
+
+  wizardId String @unique
+  wizard   WizardState @relation(fields: [wizardId], references: [id])
+}
+
+model Heir {
+  id      String @id @default(cuid())
+  nom     String
+  prenom  String
+  lien    String
+  dob     DateTime
+
+  wizardId String
+  wizard   WizardState @relation(fields: [wizardId], references: [id])
+}
+
+model Asset {
+  id       String @id @default(cuid())
+  type     String
+  valeur   String
+  adresse  String
+
+  wizardId String
+  wizard   WizardState @relation(fields: [wizardId], references: [id])
+}
+
+model Declarant {
+  id        String @id @default(cuid())
+  nom       String
+  prenom    String
+  adresse   String
+  email     String
+  telephone String
+  qualite   String
+
+  wizardId String @unique
+  wizard   WizardState @relation(fields: [wizardId], references: [id])
+}
+
+model Certs {
+  id     String @id @default(cuid())
+  exact  Boolean
+  cgu    Boolean
+
+  wizardId String @unique
+  wizard   WizardState @relation(fields: [wizardId], references: [id])
+}

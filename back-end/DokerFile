@@ -1,0 +1,23 @@
+# image Node
+FROM node:20
+
+# dossier de travail
+WORKDIR /app
+
+# copier package
+COPY package*.json ./
+
+# installer deps
+RUN npm install
+
+# copier le code
+COPY . .
+
+# prisma generate
+RUN npx prisma generate
+
+# port
+EXPOSE 3000
+
+# start
+CMD ["npm", "run", "dev"]
